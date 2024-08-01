@@ -7,6 +7,7 @@ using System.Text;
 using task_management.Context;
 using task_management.Interfaces;
 using task_management.Services;
+using task_management.Utils;
 
 namespace task_management
 {
@@ -19,7 +20,12 @@ namespace task_management
             // Add services to the container.
             builder.Services.AddDbContext<ApplicationDbContext>
     (options => options.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
+            builder.Services.AddHttpContextAccessor();
+
             builder.Services.AddTransient<IAuthService, AuthService>();
+            builder.Services.AddScoped<ITaskManagementService, TaskManagementService>();
+            builder.Services.AddScoped<UserUtils>();
+
             builder.Services.AddControllers();
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
