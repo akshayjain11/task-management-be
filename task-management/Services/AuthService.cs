@@ -5,6 +5,7 @@ using System.Text;
 using task_management.Context;
 using task_management.Interfaces;
 using task_management.Models;
+using task_management.Models.RequestModels;
 
 namespace task_management.Services
 {
@@ -34,28 +35,22 @@ namespace task_management.Services
 
         public bool AssignRoleToUser(AddUserRole obj)
         {
-            try
+            bool success = false;
+            var addRoles = new List<UserRole>();
+            var user = _context.Users.SingleOrDefault(s => s.Id == obj.UserId);
+            if (user == null)
+                throw new Exception("user is not valid");
+            foreach (int role in obj.RoleIds)
             {
-                var addRoles = new List<UserRole>();
-                var user = _context.Users.SingleOrDefault(s => s.Id == obj.UserId);
-                if (user == null)
-                    throw new Exception("user is not valid");
-                foreach (int role in obj.RoleIds)
-                {
-                    var userRole = new UserRole();
-                    userRole.RoleId = role;
-                    userRole.UserId = user.Id;
-                    addRoles.Add(userRole);
-                }
-                _context.UserRoles.AddRange(addRoles);
-                _context.SaveChanges();
-                return true;
+                var userRole = new UserRole();
+                userRole.RoleId = role;
+                userRole.UserId = user.Id;
+                addRoles.Add(userRole);
             }
-            catch (Exception ex)
-            {
-                return false;
-            }
-
+            _context.UserRoles.AddRange(addRoles);
+            _context.SaveChanges();
+            success = true;
+            return success;
         }
 
         public string Login(LoginRequest loginRequest)

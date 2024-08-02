@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using task_management.Context;
 using task_management.Interfaces;
+using task_management.Middleware;
 using task_management.Services;
 using task_management.Utils;
 
@@ -81,6 +82,7 @@ namespace task_management
 
 
             var app = builder.Build();
+            app.UseMiddleware<GlobalExceptionMiddleware>();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

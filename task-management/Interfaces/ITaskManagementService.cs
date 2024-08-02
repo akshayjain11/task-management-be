@@ -1,14 +1,17 @@
 ﻿using task_management.Models;
+using task_management.Models.RequestModels;
 
 namespace task_management.Interfaces
 {
     public interface ITaskManagementService
     {
-        public List<TaskMaster> GetTaskList();
-        public TaskMaster GetTaskById(int taskId);
-        public TaskMaster AddTask(TaskMaster obj);
-        public bool UpdateTask(TaskMaster obj);
-        public bool DeleteTaskById(int taskId);
+        public Task<List<TaskMaster>> GetTaskList();
+        public Task<List<TaskMaster>> GetAssignToTaskList();
+        public Task<List<TaskMaster>> GetCreatedByTaskList();
+        public Task<TaskMaster> GetTaskById(int taskId);
+        public Task<TaskMaster> AddTask(TaskMaster obj);
+        public bool UpdateTaskStatus(TaskMasterRequest obj);
+        public Task<bool> DeleteTaskById(int taskId);
 
     }
 }

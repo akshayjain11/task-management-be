@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using task_management.Interfaces;
 using task_management.Models;
+using task_management.Models.RequestModels;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -19,44 +20,56 @@ namespace task_management.Controllers
             _taskManagementService = taskManagementService;
         }
 
-        [HttpGet("get-task-list")]
-        public List<TaskMaster> GetTaskList()
+        [HttpGet("get-all-task-list")]
+        public async Task<List<TaskMaster>> GetTaskList()
         {
-            return _taskManagementService.GetTaskList();
+            return await _taskManagementService.GetTaskList();
         }
 
-        [HttpGet("{id}")]
-        public TaskMaster GetTaskById(int taskId)
+        [HttpGet("get-my-task-list")]
+        [Authorize(Roles = "User,Manager")]
+        public async Task<List<TaskMaster>> GetAssignToTaskList()
         {
-            return _taskManagementService.GetTaskById(taskId);
+            return await _taskManagementService.GetAssignToTaskList();
+        }
+
+        [HttpGet("get-tasks-createdbyme")]
+        [Authorize(Roles = "Manager")]
+
+        public async Task<List<TaskMaster>> GetCreatedByTaskList()
+        {
+            return await _taskManagementService.GetCreatedByTaskList();
+        }
+        [HttpGet("{taskId}")]
+        public async Task<TaskMaster> GetTaskById(int taskId)
+        {
+            return await _taskManagementService.GetTaskById(taskId);
         }
 
         // POST api/<TaskManagementController>
         [HttpPost("add-task")]
         [Authorize(Roles = "Manager")]
-
-        public TaskMaster AddTask([FromBody] TaskMaster obj)
+        public async Task<TaskMaster> AddTask([FromBody] TaskMaster obj)
         {
-            return _taskManagementService.AddTask(obj);
+            return await _taskManagementService.AddTask(obj);
         }
 
         // PUT api/<TaskManagementController>/5
-        [HttpPut("{id}")]
         [Authorize(Roles = "User,Manager")]
+        [HttpPost("update-task-status")]
 
-        public bool UpdateTask(int id, [FromBody] TaskMaster obj)
+        public bool UpdateTaskStatus([FromBody] TaskMasterRequest obj)
         {
-            return _taskManagementService.UpdateTask(obj);
-
+            return _taskManagementService.UpdateTaskStatus(obj);
         }
 
         // DELETE api/<TaskManagementController>/5
         [HttpDelete("{id}")]
         [Authorize(Roles = "Manager")]
 
-        public bool DeleteTask(int id)
+        public async Task<bool> DeleteTask(int id)
         {
-            return _taskManagementService.DeleteTaskById(id);
+            return await _taskManagementService.DeleteTaskById(id);
         }
     }
 }

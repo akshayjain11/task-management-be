@@ -1,4 +1,4 @@
-﻿namespace task_management.Models
+﻿namespace task_management.Models.RequestModels
 {
     public class LoginRequest
     {

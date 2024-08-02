@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using task_management.Interfaces;
+using task_management.Models.RequestModels;
 
 namespace task_management.Controllers
 {
@@ -22,21 +23,21 @@ namespace task_management.Controllers
             return token;
         }
 
-        [HttpPost("assignRole")]
+        [HttpPost("assign-role")]
         public bool AssignRoleToUser([FromBody] AddUserRole userRole)
         {
             var addedUserRole = _auth.AssignRoleToUser(userRole);
             return addedUserRole;
         }
 
-        [HttpPost("addUser")]
+        [HttpPost("add-user")]
         public User AddUser([FromBody] User user)
         {
             var addeduser = _auth.AddUser(user);
             return addeduser;
         }
 
-        [HttpPost("addRole")]
+        [HttpPost("add-role")]
         public Role AddRole([FromBody] Role role)
         {
             var addedRole = _auth.AddRole(role);

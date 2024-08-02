@@ -52,6 +52,7 @@ namespace task_management.Services
             catch
             {
                 isExpired = true;
+                throw;
             }
             return principal;
 
