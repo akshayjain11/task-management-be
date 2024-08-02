@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using task_management.Utils.Attributes;
 
 namespace task_management.Models.RequestModels
 {
@@ -12,7 +13,7 @@ namespace task_management.Models.RequestModels
         public string status { get; set; }
         [Required]
         public int AssignTo { get; set; }
-
+        [Base64Image]
         public string? Attachment { get; set; }
     }
 }

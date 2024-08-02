@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Data;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -45,15 +46,37 @@ namespace task_management.Services
         }
         public async Task<TaskMaster> AddTask(TaskMaster obj)
         {
-            obj.CreatedDate = DateTime.Now;
-            obj.UpdatedDate = DateTime.Now;
+            var temp= DateTime.Now;
+            obj.CreatedDate = temp;
+            obj.UpdatedDate = temp;
             ClaimsPrincipal claimsPrincipal = _userUtil.GetUserDetailsFromToken();
             obj.CreatedBy = Convert.ToInt32(claimsPrincipal?.FindFirst("id")?.Value);
-            await _context.TaskMasters.AddAsync(obj);
+
+            if (!obj.Attachment.IsNullOrEmpty())
+            {
+                if(this.WriteImageFile(string.Format(@"{0}\${1}", "C:\\Images", "image" + temp.ToString().Replace(":", "")), obj.Attachment))
+                    throw new Exception("Error occured while storing images on server.Please contact to your administrator");
+            }
+            obj.Attachment = "image"+ temp.ToString().Replace(":", "");
+
+             await _context.TaskMasters.AddAsync(obj);
+
+            
+
+
             await _context.SaveChangesAsync();
             return obj;
         }
-
+        private bool WriteImageFile(string filePath, String base64String)
+        {
+            var bytes = Convert.FromBase64String(base64String);
+            using (var imageFile = new FileStream(filePath, FileMode.Create))
+            {
+                imageFile.Write(bytes, 0, bytes.Length);
+                imageFile.Flush();
+            }
+            return false;
+        }
         public async Task<bool> DeleteTaskById(int taskId)
         {
             ClaimsPrincipal claimsPrincipal = _userUtil.GetUserDetailsFromToken();
@@ -68,8 +91,24 @@ namespace task_management.Services
 
         public async Task<TaskMaster> GetTaskById(int taskId)
         {
-            return await _context.TaskMasters.Where(e => e.Id == taskId).FirstOrDefaultAsync() ?? throw new Exception("Something went Wrong");
+            TaskMaster obj= await _context.TaskMasters.Where(e => e.Id == taskId).FirstOrDefaultAsync() ?? throw new Exception("Something went Wrong");
 
+            if (obj.Attachment.IsNullOrEmpty())
+                return obj;
+
+            string filePath = @"C:\Images\$" + obj.Attachment;
+
+            if (System.IO.File.Exists(filePath))
+            {
+                // Get the file extension and determine the content type
+                var fileExtension = Path.GetExtension(filePath).ToLowerInvariant();
+
+                // Read the file bytes
+                byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+
+                obj.Attachment= Convert.ToBase64String(fileBytes);
+            }
+            return obj;
         }
 
         public bool UpdateTaskStatus(TaskMasterRequest obj)
